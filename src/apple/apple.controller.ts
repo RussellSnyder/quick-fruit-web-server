@@ -1,25 +1,22 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { Role, User } from '@prisma/client';
-import { GetUser, Roles } from '../auth/decorators';
+import { Role } from '@prisma/client';
 import { AppleService } from './apple.service';
 import { CreateAppleDto } from './dto';
-import { JwtGuard, RolesGuard } from '../auth/guard';
-import { AuthGuard } from '../auth/guard/auth.guard';
+import { JwtGuard } from 'src/auth/guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RolesGuard } from 'src/auth/guard/roles.guard';
 
 @Controller('apples')
 export class AppleController {
   constructor(private appleService: AppleService) {}
 
   @Post()
-  @UseGuards(AuthGuard)
-  // @Roles(Role.SUPER_ADMIN)
-  // @UseGuards(RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @UseGuards(JwtGuard, RolesGuard)
   createApple(
-    @GetUser() user: User,
     @Body()
     dto: CreateAppleDto,
   ) {
-    console.log({ user });
     return this.appleService.createApple(dto);
   }
 

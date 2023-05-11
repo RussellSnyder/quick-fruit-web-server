@@ -48,7 +48,7 @@ model Apple {
 
   // TODO move name to translated table as accessionName will be untranslated
   name          String
-  accessionName String
+  accessionName String @unique
   dataUrl       String
 
   genus          String?
@@ -57,8 +57,8 @@ model Apple {
   petalFall      DateTime?
   pickingTime    String?
 
-  images      AppleImage[]
-  translation AppleTranslation?
+  images       AppleImage[]
+  translations AppleTranslation[]
 
   @@map("apples")
 }
@@ -88,8 +88,8 @@ model AppleImage {
   name String
   src  String
 
-  apple   Apple @relation(fields: [appleId], references: [id], onDelete: Cascade)
   appleId Int
+  apple   Apple @relation(fields: [appleId], references: [id], onDelete: Cascade)
 
   @@map("appleimages")
 }
