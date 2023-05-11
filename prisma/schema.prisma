@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  SUPER_ADMIN
+  ADMIN
+  TRANSLATOR_EN
+  TRANSLATOR_DE
+}
+
+enum LanguageCode {
+  EN
+  DE
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email    String @unique
+  hash     String
+  username String @unique
+
+  requestedRole Role?
+  role          Role  @default(USER)
+
+  appleTranslations    AppleTranslation[]
+  categoryTranslations CategoryTranslation[]
+
+  @@map("users")
+}
+
+model Apple {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // TODO move name to translated table as accessionName will be untranslated
+  name          String
+  accessionName String
+  dataUrl       String
+
+  genus          String?
+  startFlowering DateTime?
+  fullFlowering  DateTime?
+  petalFall      DateTime?
+  pickingTime    DateTime?
+
+  images      AppleImage[]
+  translation AppleTranslation?
+
+  @@map("apples")
+}
+
+model AppleTranslation {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  updatedAt   DateTime @updatedAt
+  updatedById Int
+  updatedBy   User     @relation(fields: [updatedById], references: [id])
+
+  languageCode LanguageCode
+  description  String?
+
+  pickingTimeText String?
+
+  appleId Int   @unique
+  apple   Apple @relation(fields: [appleId], references: [id])
+
+  @@map("appletranslations")
+}
+
+model AppleImage {
+  id Int @id @default(autoincrement())
+
+  name String
+  src  String
+
+  apple   Apple @relation(fields: [appleId], references: [id], onDelete: Cascade)
+  appleId Int
+
+  @@map("appleimages")
+}
+
+model Category {
+  id Int @id @default(autoincrement())
+
+  label String
+
+  translationId Int
+  translation   CategoryTranslation @relation(fields: [translationId], references: [id], onDelete: Cascade)
+
+  @@map("categories")
+}
+
+model CategoryTranslation {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  updatedAt   DateTime @updatedAt
+  updatedById Int
+  updatedBy   User     @relation(fields: [updatedById], references: [id])
+
+  languageCode LanguageCode
+
+  label    String
+  Category Category[]
+
+  @@map("categorytranslations")
+}
