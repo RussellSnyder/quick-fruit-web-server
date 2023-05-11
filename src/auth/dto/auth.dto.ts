@@ -13,10 +13,9 @@ export class AuthDto {
 
 export class SignUpDto extends AuthDto {
   @IsString()
-  @IsOptional()
   username: string;
 
   @IsString()
   @IsOptional()
-  requestedRole: Role;
+  requestedRole?: Role;
 }
