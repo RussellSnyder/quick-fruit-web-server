@@ -29,7 +29,7 @@ export class AuthService {
         },
       });
 
-      return this.signToken(user.id, user.email, Role.USER);
+      return this.signToken(user.id, user.email, user.role);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
