@@ -18,11 +18,10 @@ export class RolesGuard implements CanActivate {
 
     const { role: userRole } = request.user;
 
+    // console.log({ userRole });
     if (!userRole) {
       throw new ForbiddenException('Must be logged in to access');
     }
-
-    const roles = this.reflector.get<string[]>('roles', context.getHandler());
 
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
       context.getHandler(),
@@ -32,7 +31,7 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    console.log({ requiredRoles });
+    // console.log({ requiredRoles });
 
     return requiredRoles.includes(userRole);
   }

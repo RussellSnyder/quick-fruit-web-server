@@ -12,5 +12,5 @@ export class EditUserDto {
 
   @IsString()
   @IsOptional()
-  role?: Role;
+  requestedRole?: Role;
 }
