@@ -55,7 +55,7 @@ model Apple {
   startFlowering DateTime?
   fullFlowering  DateTime?
   petalFall      DateTime?
-  pickingTime    DateTime?
+  pickingTime    String?
 
   images      AppleImage[]
   translation AppleTranslation?
