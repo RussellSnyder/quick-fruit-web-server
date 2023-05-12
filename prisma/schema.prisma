@@ -37,6 +37,7 @@ model User {
 
   appleTranslations    AppleTranslation[]
   categoryTranslations CategoryTranslation[]
+  apples               Apple[]
 
   @@map("users")
 }
@@ -45,6 +46,9 @@ model Apple {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  updatedById Int
+  updatedBy   User @relation(fields: [updatedById], references: [id])
 
   // TODO move name to translated table as accessionName will be untranslated
   name          String
@@ -55,6 +59,7 @@ model Apple {
   startFlowering DateTime?
   fullFlowering  DateTime?
   petalFall      DateTime?
+  // TODO turn this into a DateTime for better querying
   pickingTime    String?
 
   images       AppleImage[]
@@ -74,9 +79,9 @@ model AppleTranslation {
   languageCode LanguageCode
   description  String?
 
-  pickingTimeText String?
+  pickingTime String?
 
-  appleId Int   @unique
+  appleId Int
   apple   Apple @relation(fields: [appleId], references: [id])
 
   @@map("appletranslations")

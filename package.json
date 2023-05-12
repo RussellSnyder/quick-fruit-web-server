@@ -14,6 +14,7 @@
     "db:test:rm": "docker compose rm test-db -s -f -v",
     "db:test:up": "docker compose up test-db -d",
     "db:test:restart": "yarn db:test:rm && yarn db:test:up && sleep 1 && yarn prisma:test:deploy",
+    "migration:dev:create": "npx prisma migrate dev --name",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -39,11 +40,13 @@
     "argon2": "^0.30.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "lodash": "^4.17.21",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "ts-mixer": "^6.0.3"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

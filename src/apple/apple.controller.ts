@@ -5,6 +5,7 @@ import { CreateAppleDto } from './dto';
 import { JwtGuard } from '../auth/guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guard/roles.guard';
+import { GetUser } from 'src/auth/decorators';
 
 @Controller('apples')
 export class AppleController {
@@ -14,10 +15,11 @@ export class AppleController {
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @UseGuards(JwtGuard, RolesGuard)
   createApple(
+    @GetUser('id') userId,
     @Body()
     dto: CreateAppleDto,
   ) {
-    return this.appleService.createApple(dto);
+    return this.appleService.createApple(dto, userId);
   }
 
   @Get()

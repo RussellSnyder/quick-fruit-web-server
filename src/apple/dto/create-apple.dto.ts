@@ -1,10 +1,13 @@
-import { IsDate, IsDateString, IsOptional, IsString } from 'class-validator';
+import { LanguageCode } from '@prisma/client';
+import { IsDateString, IsOptional, IsString } from 'class-validator';
 
-export class CreateAppleDto {
+export class AppleDto {
   @IsString()
   name: string;
+
   @IsString()
   accessionName: string;
+
   @IsString()
   dataUrl: string;
 
@@ -27,4 +30,14 @@ export class CreateAppleDto {
   @IsString()
   @IsOptional()
   pickingTime?: string;
+
+  @IsString()
+  languageCode: LanguageCode;
+
+  @IsString()
+  description: string;
 }
+
+export class CreateAppleDto extends AppleDto {}
+
+export class EditAppleDto extends AppleDto {}

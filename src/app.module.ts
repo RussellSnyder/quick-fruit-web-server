@@ -1,10 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+
+import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { AppleModule } from './apple/apple.module';
-import { JwtModule } from '@nestjs/jwt';
+import { AppleTranslationModule } from './apple-translation/apple-translation.module';
+import { AppleTranslationService } from './apple-translation/apple-translation.service';
 
 @Module({
   imports: [
