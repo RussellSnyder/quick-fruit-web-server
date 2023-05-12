@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { AppleService } from './apple.service';
 import { CreateAppleDto } from './dto';
@@ -25,5 +33,14 @@ export class AppleController {
   @Get()
   getApples(@Body('languageCode') languageCode) {
     return this.appleService.getApples(languageCode);
+  }
+
+  @Get(':id')
+  getAppleById(
+    @Param('id', ParseIntPipe) appleId: number,
+    @Body('languageCode') languageCode,
+  ) {
+    console.log({ appleId });
+    return this.appleService.getAppleById(appleId, languageCode);
   }
 }

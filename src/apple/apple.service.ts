@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { omit, pick } from 'lodash';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAppleDto } from './dto';
-import { LanguageCode } from '@prisma/client';
+import { Apple, AppleTranslation, LanguageCode } from '@prisma/client';
 
 const TRANSLATION_FIELDS = ['description', 'pickingTime', 'languageCode'];
 
@@ -25,17 +25,31 @@ export class AppleService {
       },
     });
 
-    // add the translation to the object to make it easier to read
-    const flattenTranslations = data.map((apple) => {
-      const translation = apple.translations[0];
-      const appleWithoutTranslations = omit(apple, 'translations');
-      return {
-        ...appleWithoutTranslations,
-        ...translation,
-      };
+    // add the translation to the object to make it easier to consume
+    const appleWithTranslation = data.map(this.mergeSpecificLanguageIntoApple);
+
+    return appleWithTranslation;
+  }
+
+  async getAppleById(appleId: number, languageCode: LanguageCode) {
+    const data = await this.prisma.apple.findFirst({
+      where: {
+        id: appleId,
+        translations: {
+          some: {
+            languageCode,
+          },
+        },
+      },
+      include: {
+        translations: true,
+      },
     });
 
-    return flattenTranslations;
+    // add the translation to the object to make it easier to consume
+    const appleWithTranslation = this.mergeSpecificLanguageIntoApple(data);
+
+    return appleWithTranslation;
   }
 
   async createApple(dto: CreateAppleDto, userId: number) {
@@ -117,6 +131,22 @@ export class AppleService {
         ...pick(dto, TRANSLATION_FIELDS),
         updatedById: userId,
       },
+    };
+  }
+
+  mergeSpecificLanguageIntoApple(
+    appleWithTranslations: Apple & {
+      translations: AppleTranslation[];
+    },
+  ) {
+    const translation = appleWithTranslations.translations[0];
+    const appleWithoutTranslations = omit(
+      appleWithTranslations,
+      'translations',
+    );
+    return {
+      ...appleWithoutTranslations,
+      ...translation,
     };
   }
 }

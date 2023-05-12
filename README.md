@@ -22,13 +22,14 @@ yarn migration:dev:create
 after each of these milestones, the FE will be developed to consume.
 
 ### Milestone: MVP
-- [ ] Apple Controller: Get Apple by ID
+- [x] Apple Controller: Get Apple by ID
 - [ ] Apple Serivce: Test creating many Apples (For seeding)
 - [ ] Create Category Controller (Create, Edit with MultiLanguage Support)
 - [ ] Category Translations
 
 ### Milestone: V1
 - [ ] Enable users with role 'TRANSLATOR_DE' to only modify german language (same with EN)
+- [ ] Add Fallback language (EN) if an apple for the language requested does not exist
 - [ ] Apple Controller - Enable Pagination for Get Apple
 - [ ] Apple Controller - Add filters to Get All Apples (category, size, color?)
 - [ ] Add Spanish and French language support (4 languages total)

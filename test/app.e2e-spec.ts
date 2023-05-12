@@ -292,7 +292,19 @@ describe('App e2e', () => {
             languageCode: 'DE',
           })
           .expectStatus(200)
-          .expectJsonLength(1);
+          .expectJsonLength(1)
+          .stores('germanAppleId', '[0].id');
+      });
+
+      it('should get an apple for specified language', async () => {
+        return pactum
+          .spec()
+          .get('/apples/$S{germanAppleId}')
+          .withBody({
+            languageCode: 'DE',
+          })
+          .expectStatus(200)
+          .expectBodyContains('$S{germanAppleId}');
       });
     });
   });
