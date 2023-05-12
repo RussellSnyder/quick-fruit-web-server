@@ -190,6 +190,8 @@ describe('App e2e', () => {
       fullFlowering: new Date('5 June').toJSON(),
       petalFall: new Date('15 June').toJSON(),
       pickingTime: 'Late Summer',
+      languageCode: 'EN',
+      description: 'yolo',
     });
 
     describe('create apple', () => {
@@ -228,7 +230,8 @@ describe('App e2e', () => {
             })
             .withBody(adminRoleDto)
             .expectStatus(201)
-            .expectBodyContains(adminRoleDto.name);
+            .expectBodyContains(adminRoleDto.name)
+            .stores('appleId1', 'id');
         });
       });
 
@@ -254,8 +257,42 @@ describe('App e2e', () => {
             .withBody(superAdminRoleDto)
             .expectStatus(201)
             .expectBodyContains(superAdminRoleDto.name)
-            .stores('appleId', 'id');
+            .stores('appleId2', 'id');
         });
+      });
+    });
+
+    describe('getApples', () => {
+      it('should get all apples', () => {
+        return pactum
+          .spec()
+          .get('/apples')
+          .expectStatus(200)
+          .expectBodyContains('$S{appleId1}')
+          .expectBodyContains('$S{appleId2}')
+          .expectJsonLength(2);
+      });
+      it('should get all apples for specified language', async () => {
+        await pactum
+          .spec()
+          .post('/apples')
+          .withBody({
+            ...createAppleDto('a german apple'),
+            languageCode: 'DE',
+          })
+          .withHeaders({
+            Authorization: 'Bearer $S{userAccessToken}',
+          })
+          .expectStatus(201);
+
+        return pactum
+          .spec()
+          .get('/apples')
+          .withBody({
+            languageCode: 'DE',
+          })
+          .expectStatus(200)
+          .expectJsonLength(1);
       });
     });
   });

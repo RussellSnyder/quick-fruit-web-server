@@ -1,11 +1,11 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { AppleService } from './apple.service';
 import { CreateAppleDto } from './dto';
 import { JwtGuard } from '../auth/guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guard/roles.guard';
-import { GetUser } from 'src/auth/decorators';
+import { GetUser } from '../auth/decorators';
 
 @Controller('apples')
 export class AppleController {
@@ -23,7 +23,7 @@ export class AppleController {
   }
 
   @Get()
-  getApples() {
-    return this.appleService.getApples();
+  getApples(@Body('languageCode') languageCode) {
+    return this.appleService.getApples(languageCode);
   }
 }
