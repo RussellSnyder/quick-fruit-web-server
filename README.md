@@ -26,6 +26,8 @@ after each of these milestones, the FE will be developed to consume.
 - [ ] Apple Serivce: Test creating many Apples (For seeding)
 - [ ] Create Category Controller (Create, Edit with MultiLanguage Support)
 - [ ] Category Translations
+- [ ] Seed database with scrapped data and default language translators
+
 
 ### Milestone: V1
 - [ ] Enable users with role 'TRANSLATOR_DE' to only modify german language (same with EN)
