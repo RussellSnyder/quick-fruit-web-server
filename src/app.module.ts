@@ -6,8 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { AppleModule } from './apple/apple.module';
-import { AppleTranslationModule } from './apple-translation/apple-translation.module';
-import { AppleTranslationService } from './apple-translation/apple-translation.service';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -23,6 +22,7 @@ import { AppleTranslationService } from './apple-translation/apple-translation.s
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1h' },
     }),
+    CategoryModule,
   ],
   controllers: [],
   providers: [],
