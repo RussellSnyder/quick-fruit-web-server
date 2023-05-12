@@ -8,8 +8,7 @@ const TRANSLATION_FIELDS = ['description', 'pickingTime', 'languageCode'];
 
 @Injectable()
 export class AppleService {
-  @Inject(PrismaService)
-  private readonly prisma: PrismaService;
+  constructor(private readonly prisma: PrismaService) {}
 
   async getApples(languageCode: LanguageCode = 'EN') {
     const data = await this.prisma.apple.findMany({
@@ -91,25 +90,37 @@ export class AppleService {
     });
 
     try {
-      // create the apple
-      const createdApples = await this.prisma.apple.createMany({
+      // create the apples
+      // hopefully soon this returns the created objects: https://github.com/prisma/prisma/issues/8131
+      await this.prisma.apple.createMany({
         data: appleCreateInputs,
         skipDuplicates: true,
       });
 
-      const appleTranslationCreateInputsWithAppleIds = appleCreateInputs.map(
-        (appleTranslationCreateInputs, i) => ({
-          ...appleTranslationCreateInputs,
-          appleId: createdApples[i].id,
-        }),
-      );
+      // but until then, we have to manually get the created Ids
+      const createdAppleIds = await this.prisma.apple.findMany({
+        select: {
+          id: true,
+        },
+        where: {
+          accessionName: {
+            in: appleCreateInputs.map(({ accessionName }) => accessionName),
+          },
+        },
+      });
 
-      // save translated fields
+      const appleTranslationCreateInputsWithAppleIds =
+        appleTranslationCreateInputs.map((appleTranslationCreateInput, i) => ({
+          ...appleTranslationCreateInput,
+          appleId: createdAppleIds[i].id,
+        }));
+
+      // create translated fields
       await this.prisma.appleTranslation.createMany({
         data: appleTranslationCreateInputsWithAppleIds,
       });
 
-      return createdApples;
+      return createdAppleIds;
     } catch (e) {
       throw e;
     }

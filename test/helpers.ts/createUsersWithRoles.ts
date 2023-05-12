@@ -16,7 +16,9 @@ const DEFAULT_PASSWORD = 'password';
 
 export type CreatedUsers = Record<Role, { email: string; password: string }>;
 
-export const createUsersWithRoles = async (prisma: PrismaService) => {
+export const createUsersWithRoles = async (
+  prisma: PrismaService,
+): Promise<CreatedUsers> => {
   const dataToCreateRoles: UsersWithRole = {
     USER: {
       username: 'user',
