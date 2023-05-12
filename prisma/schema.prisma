@@ -38,6 +38,7 @@ model User {
   appleTranslations    AppleTranslation[]
   categoryTranslations CategoryTranslation[]
   apples               Apple[]
+  Category             Category[]
 
   @@map("users")
 }
@@ -100,12 +101,11 @@ model AppleImage {
 }
 
 model Category {
-  id Int @id @default(autoincrement())
+  id           Int                   @id @default(autoincrement())
+  translations CategoryTranslation[]
 
-  label String
-
-  translationId Int
-  translation   CategoryTranslation @relation(fields: [translationId], references: [id], onDelete: Cascade)
+  updatedById Int
+  updatedBy   User @relation(fields: [updatedById], references: [id])
 
   @@map("categories")
 }
@@ -118,10 +118,12 @@ model CategoryTranslation {
   updatedById Int
   updatedBy   User     @relation(fields: [updatedById], references: [id])
 
+  // Label is kinda the only real thing to add
+  label        String
   languageCode LanguageCode
 
-  label    String
-  Category Category[]
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
 
   @@map("categorytranslations")
 }

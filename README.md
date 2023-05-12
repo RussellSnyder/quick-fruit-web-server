@@ -25,7 +25,6 @@ after each of these milestones, the FE will be developed to consume.
 - [x] Apple Controller: Get Apple by ID
 - [x] Apple Service: Test creating many Apples (For seeding)
 - [ ] Create Category Controller (Create, Edit with MultiLanguage Support)
-- [ ] Category Translations
 - [ ] Seed database with scrapped data and default language translators
 
 
@@ -34,6 +33,7 @@ after each of these milestones, the FE will be developed to consume.
 - [ ] Add Fallback language (EN) if an apple for the language requested does not exist
 - [ ] Apple Controller - Enable Pagination for Get Apple
 - [ ] Apple Controller - Add filters to Get All Apples (category, size, color?)
+- [ ] add verifiedByNativeSpeaker column to translation tables
 - [ ] Add Spanish and French language support (4 languages total)
 
 ### Milestone: Live Launch
