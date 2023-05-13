@@ -44,14 +44,14 @@ export class CategoryService {
     try {
       // create the categories
       // hopefully soon this returns the created objects: https://github.com/prisma/prisma/issues/8131
-      const batchPayload = await this.prisma.apple.createMany({
+      const batchPayload = await this.prisma.category.createMany({
         data: categoryCreateInputs,
         skipDuplicates: true,
       });
 
       // because no part of the DTO has survived the translation process,
       // we simply get the last creted categories
-      const createdCategoryIds = await this.prisma.apple.findMany({
+      const createdCategoryIds = await this.prisma.category.findMany({
         select: {
           id: true,
         },
@@ -70,7 +70,7 @@ export class CategoryService {
         );
 
       // create translated fields
-      await this.prisma.appleTranslation.createMany({
+      await this.prisma.categoryTranslation.createMany({
         data: categoryTranslationCreateInputsWithCategoryIds,
       });
 

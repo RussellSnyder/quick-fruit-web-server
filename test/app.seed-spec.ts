@@ -8,11 +8,14 @@ import { createUsersWithRoles } from './helpers.ts/createUsersWithRoles';
 import { CreateAppleDto } from '../src/apple/dto';
 import { LanguageCode } from '@prisma/client';
 import { faker } from '@faker-js/faker';
+import { CategoryDto } from '../src/category/dto';
+import { CategoryService } from '../src/category/category.service';
 
 describe('Seeding', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let appleService: AppleService;
+  let categoryService: CategoryService;
   let createdUsersSignInInformation;
 
   beforeAll(async () => {
@@ -32,6 +35,7 @@ describe('Seeding', () => {
 
     prisma = app.get(PrismaService);
     appleService = app.get(AppleService);
+    categoryService = app.get(CategoryService);
 
     await prisma.cleanDb();
     pactum.request.setBaseUrl('http://localhost:3333');
@@ -44,11 +48,40 @@ describe('Seeding', () => {
     app.close();
   });
 
+  describe('Seeding Categories', () => {
+    describe('createManyCategories', () => {
+      it('should create many categories', async () => {
+        const uniqueCategories = faker.helpers.uniqueArray(
+          faker.commerce.department,
+          10,
+        );
+
+        const createCategoryDtos: CategoryDto[] = uniqueCategories.map(
+          (label) => ({
+            label,
+            languageCode: LanguageCode.EN,
+          }),
+        );
+
+        const superAdmin = await prisma.user.findUnique({
+          where: {
+            email: createdUsersSignInInformation.SUPER_ADMIN.email,
+          },
+        });
+
+        const createdCategoryIds = await categoryService.createManyCategories(
+          createCategoryDtos,
+          superAdmin.id,
+        );
+
+        expect(createdCategoryIds.length).toBe(createCategoryDtos.length);
+      });
+    });
+  });
   describe('Seeding Apples', () => {
     describe('appleService', () => {
       describe('createApples', () => {
         it('should create many apples', async () => {
-          faker.person.fullName;
           const uniqueNames = faker.helpers.uniqueArray(
             faker.person.fullName,
             10,
