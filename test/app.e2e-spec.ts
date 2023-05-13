@@ -7,6 +7,8 @@ import { EditUserDto } from 'src/user/dto';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { createUsersWithRoles } from './helpers.ts/createUsersWithRoles';
+import { CategoryDto } from 'src/category/dto';
+import { Role } from '@prisma/client';
 
 describe('App e2e', () => {
   let app: INestApplication;
@@ -136,14 +138,24 @@ describe('App e2e', () => {
         return pactum.spec().post('/auth/signin').expectStatus(400);
       });
 
-      it('should signin', () => {
+      const roleCases: Role[] = [
+        Role.USER,
+        Role.TRANSLATOR_DE,
+        Role.TRANSLATOR_EN,
+        Role.ADMIN,
+        Role.SUPER_ADMIN,
+      ];
+
+      test.each(roleCases)('should signin %p', (role) => {
+        const { email, password } = createdUsersSignInInformation[role];
+
         return pactum
           .spec()
           .post('/auth/signin')
-          .withBody(dto)
+          .withBody({ email, password })
           .expectStatus(200)
           .expectBodyContains('access_token')
-          .stores('userAccessToken', 'access_token');
+          .stores(`${role}_userAccessToken`, 'access_token');
       });
     });
   });
@@ -155,7 +167,7 @@ describe('App e2e', () => {
           .spec()
           .get('/users/me')
           .withHeaders({
-            Authorization: 'Bearer $S{userAccessToken}',
+            Authorization: 'Bearer $S{USER_userAccessToken}',
           })
           .expectStatus(200);
       });
@@ -170,12 +182,46 @@ describe('App e2e', () => {
           .spec()
           .patch('/users')
           .withHeaders({
-            Authorization: 'Bearer $S{userAccessToken}',
+            Authorization: 'Bearer $S{USER_userAccessToken}',
           })
           .withBody(dto)
           .expectStatus(200)
           .expectBodyContains(dto.username)
           .expectBodyContains(dto.email);
+      });
+    });
+  });
+
+  describe('Categories', () => {
+    const categoryDto: CategoryDto = {
+      label: 'Dessert',
+      languageCode: 'EN',
+    };
+    describe('create category', () => {
+      it('should create a category', async () => {
+        return pactum
+          .spec()
+          .post('/categories')
+          .withHeaders({
+            Authorization: 'Bearer $S{ADMIN_userAccessToken}',
+          })
+          .withBody(categoryDto)
+          .expectStatus(201)
+          .stores('category_id', 'id')
+          .inspect();
+      });
+    });
+    describe('get all categories', () => {
+      it.only('should get all categories of given language', () => {
+        return pactum
+          .spec()
+          .get('/categories')
+          .withBody({
+            languageCode: categoryDto.languageCode,
+          })
+          .inspect()
+          .expectStatus(200)
+          .expectBodyContains('$S{category_id}');
       });
     });
   });
@@ -202,7 +248,7 @@ describe('App e2e', () => {
             .spec()
             .post('/apples')
             .withHeaders({
-              Authorization: 'Bearer $S{userAccessToken}',
+              Authorization: 'Bearer $S{USER_userAccessToken}',
             })
             .withBody(userRoleDto)
             .expectStatus(403);
@@ -213,20 +259,11 @@ describe('App e2e', () => {
         const adminRoleDto = createAppleDto('admin-role');
 
         it('should create an apple', async () => {
-          // sign in as super admin
-          await pactum
-            .spec()
-            .post('/auth/signin')
-            .withBody(createdUsersSignInInformation.ADMIN)
-            .expectStatus(200)
-            .expectBodyContains('access_token')
-            .stores('userAccessToken', 'access_token');
-
           return pactum
             .spec()
             .post('/apples')
             .withHeaders({
-              Authorization: 'Bearer $S{userAccessToken}',
+              Authorization: 'Bearer $S{ADMIN_userAccessToken}',
             })
             .withBody(adminRoleDto)
             .expectStatus(201)
@@ -239,20 +276,11 @@ describe('App e2e', () => {
         it('should create an apple', async () => {
           const superAdminRoleDto = createAppleDto('super-admin-role');
 
-          // sign in as super admin
-          await pactum
-            .spec()
-            .post('/auth/signin')
-            .withBody(createdUsersSignInInformation.SUPER_ADMIN)
-            .expectStatus(200)
-            .expectBodyContains('access_token')
-            .stores('userAccessToken', 'access_token');
-
           return pactum
             .spec()
             .post('/apples')
             .withHeaders({
-              Authorization: 'Bearer $S{userAccessToken}',
+              Authorization: 'Bearer $S{SUPER_ADMIN_userAccessToken}',
             })
             .withBody(superAdminRoleDto)
             .expectStatus(201)
@@ -281,7 +309,7 @@ describe('App e2e', () => {
             languageCode: 'DE',
           })
           .withHeaders({
-            Authorization: 'Bearer $S{userAccessToken}',
+            Authorization: 'Bearer $S{ADMIN_userAccessToken}',
           })
           .expectStatus(201);
 
@@ -295,7 +323,8 @@ describe('App e2e', () => {
           .expectJsonLength(1)
           .stores('germanAppleId', '[0].id');
       });
-
+    });
+    describe('getApple by id', () => {
       it('should get an apple for specified language', async () => {
         return pactum
           .spec()
