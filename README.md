@@ -16,6 +16,8 @@ if you change something in the prisma schema, create a migration with the follow
 yarn migration:dev:create
 ```
 
+## Bugs
+- If langauge is unknown, application returns 500. It should return an error that says that the language given is not valid
 
 ## TODO / Roadmap
 
