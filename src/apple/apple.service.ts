@@ -1,8 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { Apple, AppleTranslation, LanguageCode } from '@prisma/client';
 import { omit, pick } from 'lodash';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAppleDto } from './dto';
-import { Apple, AppleTranslation, LanguageCode } from '@prisma/client';
 
 const TRANSLATION_FIELDS = ['description', 'pickingTime', 'languageCode'];
 
@@ -24,14 +24,18 @@ export class AppleService {
       },
     });
 
+    console.log({ data });
     // add the translation to the object to make it easier to consume
     const appleWithTranslation = data.map(this.mergeSpecificLanguageIntoApple);
 
     return appleWithTranslation;
   }
 
-  async getAppleById(appleId: number, languageCode: LanguageCode) {
+  async getAppleById(appleId: number, languageCode: LanguageCode = 'EN') {
     const data = await this.prisma.apple.findFirst({
+      include: {
+        translations: true,
+      },
       where: {
         id: appleId,
         translations: {
@@ -39,9 +43,6 @@ export class AppleService {
             languageCode,
           },
         },
-      },
-      include: {
-        translations: true,
       },
     });
 

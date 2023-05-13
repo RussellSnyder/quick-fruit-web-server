@@ -5,15 +5,16 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
+import { GetUser } from '../auth/decorators';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { JwtGuard } from '../auth/guard';
+import { RolesGuard } from '../auth/guard/roles.guard';
 import { AppleService } from './apple.service';
 import { CreateAppleDto } from './dto';
-import { JwtGuard } from '../auth/guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { RolesGuard } from '../auth/guard/roles.guard';
-import { GetUser } from '../auth/decorators';
 
 @Controller('apples')
 export class AppleController {
@@ -31,16 +32,15 @@ export class AppleController {
   }
 
   @Get()
-  getApples(@Body('languageCode') languageCode) {
-    return this.appleService.getApples(languageCode);
+  getApples(@Query('language') languageCode) {
+    return this.appleService.getApples(languageCode?.toUpperCase());
   }
 
   @Get(':id')
   getAppleById(
     @Param('id', ParseIntPipe) appleId: number,
-    @Body('languageCode') languageCode,
+    @Query('language') languageCode,
   ) {
-    console.log({ appleId });
-    return this.appleService.getAppleById(appleId, languageCode);
+    return this.appleService.getAppleById(appleId, languageCode?.toUpperCase());
   }
 }
