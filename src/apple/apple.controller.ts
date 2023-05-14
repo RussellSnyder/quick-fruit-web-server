@@ -24,10 +24,11 @@ export class AppleController {
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @UseGuards(JwtGuard, RolesGuard)
   createApple(
-    @GetUser('id') userId,
+    @GetUser('id', ParseIntPipe) userId,
     @Body()
     dto: CreateAppleDto,
   ) {
+    console.log({ dto });
     return this.appleService.createApple(dto, userId);
   }
 

@@ -80,7 +80,7 @@ describe('Seeding', () => {
   });
   describe('Seeding Apples', () => {
     describe('appleService', () => {
-      describe('createApples', () => {
+      describe('createManyApples', () => {
         it('should create many apples', async () => {
           const uniqueNames = faker.helpers.uniqueArray(
             faker.person.fullName,
@@ -93,6 +93,7 @@ describe('Seeding', () => {
             dataUrl: `${name}.com`,
             languageCode: LanguageCode.EN,
             description: `${name} is a tasty apple`,
+            categories: [],
           }));
 
           const superAdmin = await prisma.user.findUnique({
@@ -101,7 +102,49 @@ describe('Seeding', () => {
             },
           });
 
-          const createdAppleIds = await appleService.createApples(
+          const createdAppleIds = await appleService.createManyApples(
+            createAppleDtos,
+            superAdmin.id,
+          );
+
+          expect(createdAppleIds.length).toBe(createAppleDtos.length);
+        });
+
+        it.skip('should create many apples with categories', async () => {
+          const uniqueAppleNames = faker.helpers.uniqueArray(
+            faker.person.fullName,
+            10,
+          );
+
+          const categories = await categoryService.getAllCategories(
+            LanguageCode.EN,
+          );
+
+          const createAppleDtos: CreateAppleDto[] = uniqueAppleNames.map(
+            (name) => {
+              const appleCategories = faker.helpers.arrayElements(categories, {
+                min: 1,
+                max: 5,
+              });
+
+              return {
+                name,
+                accessionName: name,
+                dataUrl: `${name}.com`,
+                languageCode: LanguageCode.EN,
+                description: `${name} is a tasty apple`,
+                categories: appleCategories.map(({ id }) => id),
+              };
+            },
+          );
+
+          const superAdmin = await prisma.user.findUnique({
+            where: {
+              email: createdUsersSignInInformation.SUPER_ADMIN.email,
+            },
+          });
+
+          const createdAppleIds = await appleService.createManyApples(
             createAppleDtos,
             superAdmin.id,
           );

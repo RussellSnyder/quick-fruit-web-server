@@ -1,5 +1,5 @@
 import { LanguageCode } from '@prisma/client';
-import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsDateString, IsOptional, IsString } from 'class-validator';
 
 export class AppleDto {
   @IsString()
@@ -36,6 +36,9 @@ export class AppleDto {
 
   @IsString()
   description: string;
+
+  @IsArray()
+  categories: number[];
 }
 
 export class CreateAppleDto extends AppleDto {}

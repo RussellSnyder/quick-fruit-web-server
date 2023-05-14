@@ -53,26 +53,43 @@ export class AppleService {
   }
 
   async createApple(dto: CreateAppleDto, userId: number) {
-    const { appleCreateInput, appleTranslationCreateInput } =
-      this.splitTranlsationFields(dto, userId);
+    const { appleCreateInput, appleTranslationCreateInput, categories } =
+      this.splitIntoCreationInputs(dto);
 
     try {
       // create the apple
       const createdApple = await this.prisma.apple.create({
         data: {
           ...appleCreateInput,
+          updatedById: userId,
+          categories: {
+            create: categories.map((catId) => ({
+              // updatedById: userId,
+              categoryId: Number(catId),
+              assignedAt: new Date(),
+              assignedById: userId,
+            })),
+          },
+        },
+        include: {
+          categories: true,
         },
       });
 
       // save translated fields
-      await this.prisma.appleTranslation.create({
+      const createdTranslation = await this.prisma.appleTranslation.create({
         data: {
           ...appleTranslationCreateInput,
           appleId: createdApple.id,
+          updatedById: userId,
+          createdAt: new Date(),
         },
       });
 
-      return createdApple;
+      return {
+        ...createdApple,
+        ...createdTranslation,
+      };
     } catch (e) {
       throw e;
     }
@@ -84,7 +101,7 @@ export class AppleService {
 
     dtos.forEach((dto) => {
       const { appleCreateInput, appleTranslationCreateInput } =
-        this.splitTranlsationFields(dto, userId);
+        this.splitIntoCreationInputs(dto);
 
       appleCreateInputs.push(appleCreateInput);
       appleTranslationCreateInputs.push(appleTranslationCreateInput);
@@ -127,22 +144,21 @@ export class AppleService {
     }
   }
 
-  splitTranlsationFields(
-    dto: CreateAppleDto,
-    userId: number,
-  ): {
+  splitIntoCreationInputs(dto: CreateAppleDto): {
     appleTranslationCreateInput: any;
     appleCreateInput: any;
+    categories: number[];
   } {
+    const dtoWithoutCategories = omit(dto, 'categories');
+    const categories = dto.categories;
+
     return {
-      appleCreateInput: {
-        ...omit(dto, TRANSLATION_FIELDS),
-        updatedById: userId,
-      },
-      appleTranslationCreateInput: {
-        ...pick(dto, TRANSLATION_FIELDS),
-        updatedById: userId,
-      },
+      appleCreateInput: omit(dtoWithoutCategories, TRANSLATION_FIELDS),
+      appleTranslationCreateInput: pick(
+        dtoWithoutCategories,
+        TRANSLATION_FIELDS,
+      ),
+      categories,
     };
   }
 
