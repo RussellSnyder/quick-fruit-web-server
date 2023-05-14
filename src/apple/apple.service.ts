@@ -70,22 +70,19 @@ export class AppleService {
               assignedById: userId,
             })),
           },
+          translations: {
+            create: [{ ...appleTranslationCreateInput, updatedById: userId }],
+          },
         },
         include: {
           categories: true,
+          translations: true,
         },
       });
 
-      // save translated fields
-      const createdTranslation = await this.prisma.appleTranslation.create({
-        data: {
-          ...appleTranslationCreateInput,
-          appleId: createdApple.id,
-          updatedById: userId,
-          createdAt: new Date(),
-        },
-      });
+      const createdTranslation = createdApple.translations[0];
 
+      // TODO add this to categoryTranslation service
       const categoryTranslations =
         await this.prisma.categoryTranslation.findMany({
           where: {
@@ -105,7 +102,7 @@ export class AppleService {
         }),
       );
       return {
-        ...createdApple,
+        ...omit(createdApple, 'translations'),
         ...pick(createdTranslation, TRANSLATION_FIELDS),
         categories: categoriesWithTranslations,
       };
