@@ -86,9 +86,28 @@ export class AppleService {
         },
       });
 
+      const categoryTranslations =
+        await this.prisma.categoryTranslation.findMany({
+          where: {
+            id: {
+              in: createdApple.categories.map(({ categoryId }) => categoryId),
+            },
+            languageCode: {
+              equals: dto.languageCode,
+            },
+          },
+        });
+
+      const categoriesWithTranslations = createdApple.categories.map(
+        (cat, i) => ({
+          ...pick(cat, ['categoryId']),
+          label: categoryTranslations[i].label,
+        }),
+      );
       return {
         ...createdApple,
-        ...createdTranslation,
+        ...pick(createdTranslation, TRANSLATION_FIELDS),
+        categories: categoriesWithTranslations,
       };
     } catch (e) {
       throw e;

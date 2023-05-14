@@ -28,7 +28,6 @@ export class AppleController {
     @Body()
     dto: CreateAppleDto,
   ) {
-    console.log({ dto });
     return this.appleService.createApple(dto, userId);
   }
 
