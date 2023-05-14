@@ -26,7 +26,7 @@ after each of these milestones, the FE will be developed to consume.
 ### Milestone: MVP
 - [x] Apple Controller: Get Apple by ID
 - [x] Apple Service: Test creating many Apples (For seeding)
-- [ ] Create Category Controller (Create, Edit with MultiLanguage Support)
+- [x] Create Category Controller (Create, Edit with MultiLanguage Support)
 - [ ] Seed database with scrapped data and default language translators
 
 

@@ -10,11 +10,14 @@ import { LanguageCode } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import { CategoryDto } from '../src/category/dto';
 import { CategoryService } from '../src/category/category.service';
+import { AppleTranslationService } from '../src/apple-translation/apple-translation.service';
+import { AppleTranslationDto } from '../src/apple-translation/dto/apple-translation.dto';
 
 describe('Seeding', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let appleService: AppleService;
+  let appleTranslationService: AppleTranslationService;
   let categoryService: CategoryService;
   let createdUsersSignInInformation;
 
@@ -35,6 +38,7 @@ describe('Seeding', () => {
 
     prisma = app.get(PrismaService);
     appleService = app.get(AppleService);
+    appleTranslationService = app.get(AppleTranslationService);
     categoryService = app.get(CategoryService);
 
     await prisma.cleanDb();
@@ -156,6 +160,71 @@ describe('Seeding', () => {
           expect(
             createdApples[0].categories.map(({ categoryId }) => categoryId),
           ).toEqual(createAppleDtos[0].categories);
+        });
+      });
+    });
+    describe('appleTranslationService', () => {
+      describe('createAppleTranslation', () => {
+        it('should create a translation for an apple', async () => {
+          const apple = await prisma.apple.findFirst();
+
+          const translationDto: AppleTranslationDto = {
+            languageCode: 'DE',
+            description: 'gut dinge',
+          };
+
+          const superAdmin = await prisma.user.findUnique({
+            where: {
+              email: createdUsersSignInInformation.SUPER_ADMIN.email,
+            },
+          });
+
+          const translation =
+            await appleTranslationService.createAppleTranslation(
+              translationDto,
+              apple.id,
+              superAdmin.id,
+            );
+
+          expect(translation.appleId).toBe(apple.id);
+
+          await prisma.appleTranslation.delete({
+            where: {
+              id: translation.id,
+            },
+          });
+        });
+      });
+      describe('createManyTranslationsForManyApples', () => {
+        it('should create many translationss for many apples', async () => {
+          // delete translations that were previously made
+          prisma.appleTranslation.deleteMany({});
+          const languageToTranslateInto: LanguageCode = 'DE';
+          const allApples = await prisma.apple.findMany();
+
+          const superAdmin = await prisma.user.findUnique({
+            where: {
+              email: createdUsersSignInInformation.SUPER_ADMIN.email,
+            },
+          });
+
+          const appleTranslationDtos: AppleTranslationDto[] = allApples.map(
+            ({ id }) => ({
+              languageCode: languageToTranslateInto,
+              pickingTime: 'Spat Oktober',
+              description: faker.commerce.productDescription(),
+              appleId: id,
+            }),
+          );
+
+          const translations =
+            await appleTranslationService.createManyTranslationsForManyApples(
+              appleTranslationDtos,
+              allApples.map(({ accessionName }) => accessionName),
+              superAdmin.id,
+            );
+
+          expect(translations.length).toBe(allApples.length);
         });
       });
     });
