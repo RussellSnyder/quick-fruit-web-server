@@ -95,53 +95,16 @@ export class AppleService {
     }
   }
 
-  async createApples(dtos: CreateAppleDto[], userId: number) {
-    const appleCreateInputs = [];
-    const appleTranslationCreateInputs = [];
+  async createManyApples(dtos: CreateAppleDto[], userId: number) {
+    const promises = [];
 
     dtos.forEach((dto) => {
-      const { appleCreateInput, appleTranslationCreateInput } =
-        this.splitIntoCreationInputs(dto);
-
-      appleCreateInputs.push(appleCreateInput);
-      appleTranslationCreateInputs.push(appleTranslationCreateInput);
+      promises.push(this.createApple(dto, userId));
     });
 
-    try {
-      // create the apples
-      // hopefully soon this returns the created objects: https://github.com/prisma/prisma/issues/8131
-      await this.prisma.apple.createMany({
-        data: appleCreateInputs,
-        skipDuplicates: true,
-      });
+    const createdApples = Promise.all(promises);
 
-      // but until then, we have to manually get the created Ids
-      const createdAppleIds = await this.prisma.apple.findMany({
-        select: {
-          id: true,
-        },
-        where: {
-          accessionName: {
-            in: appleCreateInputs.map(({ accessionName }) => accessionName),
-          },
-        },
-      });
-
-      const appleTranslationCreateInputsWithAppleIds =
-        appleTranslationCreateInputs.map((appleTranslationCreateInput, i) => ({
-          ...appleTranslationCreateInput,
-          appleId: createdAppleIds[i].id,
-        }));
-
-      // create translated fields
-      await this.prisma.appleTranslation.createMany({
-        data: appleTranslationCreateInputsWithAppleIds,
-      });
-
-      return createdAppleIds;
-    } catch (e) {
-      throw e;
-    }
+    return createdApples;
   }
 
   splitIntoCreationInputs(dto: CreateAppleDto): {

@@ -102,15 +102,18 @@ describe('Seeding', () => {
             },
           });
 
-          const createdAppleIds = await appleService.createManyApples(
+          const createdApples = await appleService.createManyApples(
             createAppleDtos,
             superAdmin.id,
           );
 
-          expect(createdAppleIds.length).toBe(createAppleDtos.length);
+          expect(createdApples.length).toBe(createAppleDtos.length);
+          expect(createdApples[0].accessionName).toBe(
+            createAppleDtos[0].accessionName,
+          );
         });
 
-        it.skip('should create many apples with categories', async () => {
+        it('should create many apples with categories', async () => {
           const uniqueAppleNames = faker.helpers.uniqueArray(
             faker.person.fullName,
             10,
@@ -144,12 +147,15 @@ describe('Seeding', () => {
             },
           });
 
-          const createdAppleIds = await appleService.createManyApples(
+          const createdApples = await appleService.createManyApples(
             createAppleDtos,
             superAdmin.id,
           );
 
-          expect(createdAppleIds.length).toBe(createAppleDtos.length);
+          expect(createdApples.length).toBe(createAppleDtos.length);
+          expect(
+            createdApples[0].categories.map(({ categoryId }) => categoryId),
+          ).toEqual(createAppleDtos[0].categories);
         });
       });
     });
