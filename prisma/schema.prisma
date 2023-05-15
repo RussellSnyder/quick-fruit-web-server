@@ -61,8 +61,6 @@ model Apple {
   startFlowering DateTime?
   fullFlowering  DateTime?
   petalFall      DateTime?
-  // TODO turn this into a DateTime for better querying
-  pickingTime    String?
 
   images       AppleImage[]
   translations AppleTranslation[]
@@ -72,17 +70,49 @@ model Apple {
 }
 
 model AppleTranslation {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-
-  updatedAt   DateTime @updatedAt
-  updatedById Int
-  updatedBy   User     @relation(fields: [updatedById], references: [id])
-
+  id           Int          @id @default(autoincrement())
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
   languageCode LanguageCode
-  description  String?
 
-  pickingTime String?
+  // The actual translated fields
+  description            String?
+  pickingTime            String?
+  size                   String?
+  shape                  String?
+  height                 String?
+  width                  String?
+  ribbing                String?
+  crown                  String?
+  groundColour           String?
+  overColour             String?
+  overColourAmount       String?
+  overColourPattern      String?
+  russet                 String?
+  coarseness             String?
+  fleshColour            String?
+  // TODO
+  // images                 String?
+  greasiness             String?
+  crunch                 String?
+  juiciness              String?
+  floweringTimeTree1     String?
+  pickingTimeTree1       String?
+  sizeTree2              String?
+  shapeTree2             String?
+  crownTree2             String?
+  groundColourTree2      String?
+  overColourTree2        String?
+  overColourPatternTree2 String?
+  russetTree2            String?
+  ribbingTree2           String?
+  heightTree2            String?
+  widthTree2             String?
+  juicinessTree2         String?
+
+  // Relations to other tables
+  updatedById Int
+  updatedBy   User @relation(fields: [updatedById], references: [id])
 
   appleId Int
   apple   Apple @relation(fields: [appleId], references: [id])

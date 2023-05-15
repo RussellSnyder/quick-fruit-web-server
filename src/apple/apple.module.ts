@@ -6,5 +6,6 @@ import { AppleService } from './apple.service';
   imports: [],
   controllers: [AppleController],
   providers: [AppleService],
+  exports: [AppleService],
 })
 export class AppleModule {}

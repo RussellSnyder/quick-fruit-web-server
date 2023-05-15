@@ -8,6 +8,8 @@ import { UserModule } from './user/user.module';
 import { AppleModule } from './apple/apple.module';
 import { CategoryModule } from './category/category.module';
 import { AppleTranslationModule } from './apple-translation/apple-translation.module';
+import { SeederModule } from './seeder/seeder.module';
+import { CategoryTranslationModule } from './category-translation/category-translation.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { AppleTranslationModule } from './apple-translation/apple-translation.mo
       signOptions: { expiresIn: '24h' },
     }),
     CategoryModule,
+    SeederModule,
+    CategoryTranslationModule,
   ],
   controllers: [],
   providers: [],

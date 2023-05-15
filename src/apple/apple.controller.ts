@@ -15,6 +15,7 @@ import { JwtGuard } from '../auth/guard';
 import { RolesGuard } from '../auth/guard/roles.guard';
 import { AppleService } from './apple.service';
 import { CreateAppleDto } from './dto';
+import { AppleTranslationDto } from 'src/apple-translation/dto/apple-translation.dto';
 
 @Controller('apples')
 export class AppleController {
@@ -26,7 +27,7 @@ export class AppleController {
   createApple(
     @GetUser('id', ParseIntPipe) userId,
     @Body()
-    dto: CreateAppleDto,
+    dto: CreateAppleDto & AppleTranslationDto,
   ) {
     return this.appleService.createApple(dto, userId);
   }

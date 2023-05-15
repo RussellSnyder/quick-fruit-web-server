@@ -1,1 +1,1 @@
-export * from './create-apple.dto';
+export * from './apple.dto';

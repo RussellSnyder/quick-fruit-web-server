@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AppleTranslationDto } from './dto/apple-translation.dto';
+import { omit } from 'lodash';
 
 @Injectable()
 export class AppleTranslationService {
   constructor(private prisma: PrismaService) {}
+
+  getTranslatedFields() {
+    return omit(AppleTranslationDto, ['languageCode']);
+  }
 
   createAppleTranslation(
     dto: AppleTranslationDto,

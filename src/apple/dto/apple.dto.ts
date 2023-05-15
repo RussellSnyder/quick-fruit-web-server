@@ -1,5 +1,7 @@
 import { LanguageCode } from '@prisma/client';
 import { IsArray, IsDateString, IsOptional, IsString } from 'class-validator';
+import { AppleTranslationDto } from 'src/apple-translation/dto/apple-translation.dto';
+import { Mixin } from 'ts-mixer';
 
 export class AppleDto {
   @IsString()
@@ -27,18 +29,12 @@ export class AppleDto {
   @IsOptional()
   petalFall?: string;
 
-  @IsString()
-  @IsOptional()
-  pickingTime?: string;
-
-  @IsString()
-  languageCode: LanguageCode;
-
-  @IsString()
-  description: string;
-
   @IsArray()
   categories: number[];
+
+  @IsArray()
+  @IsOptional()
+  images: string[];
 }
 
 export class CreateAppleDto extends AppleDto {}
